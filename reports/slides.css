@@ -17,3 +17,8 @@
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}@media print{*{animation:none!important;transition:none!important}.reveal #title-slide{display:flex!important}}
 
 .reveal .visual-grid{display:block;width:65%;height:560px}.reveal .insight{position:absolute;right:64px;top:255px;width:28%;box-sizing:border-box}.reveal .test-result .insight{top:245px}
+
+/* Preserve the section as the positioning container for chart annotations. */
+.reveal section.present .visual-grid { animation: chart-fade .6s ease both; }
+@keyframes chart-fade { from { opacity:0; } to { opacity:1; } }
+
