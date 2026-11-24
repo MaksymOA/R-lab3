@@ -1,7 +1,7 @@
 ---
-title: "Прогноз паливної економічності"
-subtitle: "Лабораторна робота №3 · Auto MPG"
-author: "Басок Максим"
+title: "Від зв’язку до прогнозу"
+subtitle: "Моделювання паливної економічності · Auto MPG"
+author: "Басок Максим · Лабораторна робота №3"
 format:
   revealjs:
     embed-resources: true
@@ -9,10 +9,12 @@ format:
     css: slides.css
     slide-number: true
     transition: fade
+    background-transition: fade
     width: 1600
     height: 900
-    margin: 0.07
+    margin: 0.05
     center: false
+    auto-stretch: false
 execute:
   echo: false
   warning: false
@@ -26,176 +28,168 @@ library(data.table)
 library(jsonlite)
 r <- fromJSON("outputs/metadata/results.json")
 cv <- fread("outputs/tables/cv_summary.csv")
-test <- fread("outputs/tables/test_metrics.csv")
 ci <- fread("outputs/tables/baseline_coefficients_cluster95.csv")
 errs <- fread("outputs/tables/test_error_groups.csv")
+pred <- fread("outputs/tables/test_predictions.csv")
+fmt <- function(x,d=2) formatC(x,format="f",digits=d,decimal.mark=",")
+svg_text <- function(x,y,label,size=24,color="#514960",anchor="start")
+  sprintf('<text x="%s" y="%s" font-size="%s" fill="%s" text-anchor="%s">%s</text>',x,y,size,color,anchor,label)
+svg <- function(content,label) cat(sprintf('<svg class="vector" viewBox="0 0 900 510" role="img" aria-label="%s" xmlns="http://www.w3.org/2000/svg">%s</svg>',label,content))
+image <- function(name) knitr::include_graphics(normalizePath(paste0("outputs/figures/",name),winslash="/"))
 ```
 
-## Чи можна спрогнозувати mpg нової моделі?
+## Наскільки точно можна передбачити mpg? {.context}
 
-::: {.columns}
-::: {.column width="55%"}
-**Ціль:** міська економічність у милях на галон США.
+```{=html}
+<div class="eyebrow">01 / задача</div>
+<div class="context-grid">
+<div class="statement">Ми знаємо характеристики авто.<br><em>Чи можемо передбачити його економічність?</em></div>
+<div class="fact-column"><div class="fact"><strong>398</strong><span>записів про моделі</span></div><div class="fact"><strong>1970–82</strong><span>історичний період</span></div></div>
+</div>
+<div class="bottom-strip"><span><b>Ціль</b> mpg — милі на галон США</span><span><b>Фактори</b> маса · потужність · рік · походження</span></div>
+<div class="footnote">Більше mpg — економніше. Прогноз для нових назв у тому самому періоді, не для сучасних авто. UCI Auto MPG · CC BY 4.0.</div>
+```
 
-**Прогноз:** для відкладених назв авто того самого історичного періоду.
+## Дві гіпотези до оцінювання {.hypotheses}
 
-Маса · потужність · рік · походження.
-:::
-::: {.column width="45%"}
-::: {.metric}
-398
-:::
-записів · 1970–1982
+```{=html}
+<div class="eyebrow">02 / очікування</div>
+<div class="hypothesis-grid">
+<article class="hypothesis"><span class="tag">H1 / МАСА</span><div class="direction">+1000 lb <span>→</span> −mpg</div><p>За однакових потужності, року й походження більша маса пов’язана з нижчим mpg.</p></article>
+<article class="hypothesis"><span class="tag">H2 / МОДЕЛЬНИЙ РІК</span><div class="direction">+1 рік <span>→</span> +mpg</div><p>Пізніші моделі мають вищий mpg за врахування інших предикторів.</p></article>
+</div>
+<div class="note"><b>Як перевіряємо:</b> знак, величина й 95% кластерний інтервал коефіцієнта у M1.</div>
+<div class="footnote">DOE (2023): маса, енерговитрати й технології. EPA (2026): історичні зміни та склад автопарку. Гіпотези підказані EDA ЛР №2 — перевірка розвідувальна.</div>
+```
 
-[UCI Auto MPG](https://doi.org/10.24432/C5859H) · CC BY 4.0
-:::
-:::
+## Форма зв’язку підказала модифікацію {.chart-slide}
 
-## Два очікування з EDA та літератури
-
-::: {.columns}
-::: {.column width="50%"}
-### H1: маса ↓ mpg
-
-Коефіцієнт +1000 фунтів від’ємний за врахування потужності, року й походження.
-:::
-::: {.column width="50%"}
-### H2: рік ↑ mpg
-
-Пізніший модельний рік пов’язаний із вищим mpg за решти предикторів.
-:::
-:::
-
-DOE (2023) підкреслює роль маси й технологій; EPA (2026) — зміну складу автопарку.
-
-**Перевірка:** коефіцієнти M1 та 95% кластерні інтервали. Гіпотези розвідувальні: весь набір уже переглядався в ЛР №2.
-
-## Маса підказує нелінійний член
-
-::: {.columns}
-::: {.column width="70%"}
+```{=html}
+<div class="eyebrow">03 / від EDA до формули</div><div class="visual-grid"><div class="figure-box">
+```
 ```{r}
-knitr::include_graphics(normalizePath("outputs/figures/02_eda_weight.png", winslash="/"))
+image("02_eda_weight.png")
 ```
-:::
-::: {.column width="30%"}
-Графік побудовано **тільки на train**.
+```{=html}
+</div><div class="insight"><span class="tag">ТІЛЬКИ TRAIN</span><h3>Спад є.<br>Пряма описує не все.</h3><p>Маса входить у M1.</p><p>Квадрат маси в M2 має врахувати кривизну.</p><div class="micro">Графік не доводить причинного впливу маси.</div></div></div>
+```
 
-Спадний зв’язок і кривизна → маса у M1 та квадрат маси у M2.
+## Назви автомобілів не перетинають поділ {.protocol}
 
-Регіон не трактуємо як причинний фактор.
-:::
-:::
+```{=html}
+<div class="eyebrow">04 / захист від витоку</div>
+<div class="pipeline">
+<div class="pipe-block"><span class="tag">УСІ ДАНІ</span><strong>398</strong><span>записів</span></div>
+<div class="pipe-arrow">→</div>
+<div class="pipe-block train"><span class="tag">НАВЧАННЯ</span><strong>316</strong><span>244 назви</span><div class="folds"><i></i><i></i><i></i><i></i><i></i></div><small>5 folds × 3 повтори</small></div>
+<div class="pipe-arrow">→</div>
+<div class="pipe-block test"><span class="tag">ТЕСТ</span><strong>82</strong><span>61 назва</span><small>Після фіксації моделі</small></div>
+</div>
+<div class="two-notes"><p><b>Імпутація:</b> медіана потужності лише з навчальної частини кожного fold.</p><p><b>Вибір:</b> найменший середній RMSE. MAE показуємо додатково. Обидві метрики — у mpg.</p></div>
+<div class="footnote">Seed 312024. Test відкладений від поточного підбору, але весь набір уже переглядався в EDA ЛР №2.</div>
+```
 
-## Перевірка за назвами автомобілів
+## Квадрат маси зменшив помилку на CV {.comparison}
 
-::: {.columns}
-::: {.column width="50%"}
-### Навчання
-
-**`r r$train_rows` записів · `r r$train_groups` назв**
-
-5-fold CV × 3 повтори.
-
-Спільні folds для всіх моделей. Медіана потужності лише з analysis-частини.
-:::
-::: {.column width="50%"}
-### Test
-
-**`r r$test_rows` записи · `r r$test_groups` назва**
-
-Вибір фіксуємо **до оцінювання test**.
-
-Основна метрика — RMSE; додаткова — MAE. Обидві у mpg.
-:::
-:::
-
-Назви не перетинають поділ. Незалежність від попереднього EDA обмежена.
-
-## Квадрат маси покращив CV
-
+```{=html}
+<div class="eyebrow">05 / порівняння моделей</div><div class="visual-grid"><div class="figure-box transparent">
+```
 ```{r}
-knitr::kable(cv,digits=2,col.names=c("Модель","RMSE середнє","RMSE SD","MAE середнє","MAE SD"))
+#| results: asis
+b <- svg_text(15,35,"RMSE · середнє на 15 спільних folds",25)
+for (i in 1:3) {
+  row <- cv[i]; y <- 90+(i-1)*130
+  color <- if(row$model=="M2") "#d65b35" else "#b5acc4"
+  label <- c(Mean="Середнє train",M1="Лінійна M1",M2="Квадратична M2")[[row$model]]
+  b <- paste0(b,svg_text(15,y+25,label,27),
+    sprintf('<rect class="bar" x="270" y="%s" width="%.1f" height="52" rx="6" fill="%s"/>',y-10,row$RMSE_mean/9*450,color),
+    svg_text(740,y+23,fmt(row$RMSE_mean),34,if(row$model=="M2") "#a53a23" else "#514960"))
+}
+b <- paste0(b,svg_text(15,495,"Менше RMSE — точніший прогноз",23))
+svg(b,"Порівняння RMSE моделей: середнє train, M1 та M2")
+```
+```{=html}
+</div><div class="insight"><span class="tag">ОБРАНО ЗА CV</span><div class="hero-number">M2</div><p><b>M1:</b> маса + потужність + рік + походження.</p><p><b>M2:</b> ті самі ознаки + квадрат маси.</p><div class="micro">Обираємо до відкриття тесту. SD між folds: M1 ≈0,25; M2 ≈0,24 mpg. Це не довірчі інтервали.</div></div></div>
 ```
 
-**Mean:** середнє train. **M1:** маса + потужність + рік + походження.
+## Поліпшення є. Залишки не ідеальні. {.chart-slide}
 
-**M2:** M1 + квадрат маси. Обрано **`r r$selected`** за найменшим середнім RMSE.
-
-SD відбиває розкид між folds, а не довірчий інтервал.
-
-## Покращення не усунуло всіх проблем
-
-::: {.columns}
-::: {.column width="70%"}
+```{=html}
+<div class="eyebrow">06 / діагностика</div><div class="visual-grid"><div class="figure-box">
+```
 ```{r}
-knitr::include_graphics(normalizePath("outputs/figures/04_residuals.png", winslash="/"))
+image("04_residuals.png")
 ```
-:::
-::: {.column width="30%"}
-У M2 слабший вигин залишків.
+```{=html}
+</div><div class="insight"><span class="tag">НАВЧАЛЬНІ ДАНІ</span><h3>У M2<br>слабший вигин</h3><p>Зберігаються неоднаковий розкид і великі залишки.</p><div class="micro">Перевірено Q–Q, scale–location та Cook. Впливові записи збережено; графіки є у звіті.</div></div></div>
+```
 
-Зберігаються неоднаковий розкид, важкі хвости та впливові записи.
+## Обидва очікувані напрями підтримуються {.inference}
 
-Cook 4/n — привід перевірити, не автоматично видаляти.
-:::
-:::
-
-## Що показали гіпотези у M1?
-
+```{=html}
+<div class="eyebrow">07 / гіпотези у базовій M1</div><div class="hypothesis-grid">
+```
 ```{r}
-h <- ci[term %in% c("weight1000","year"),.(term,estimate,lower,upper)]
-knitr::kable(h,digits=2,col.names=c("Показник","Оцінка","Нижня 95%","Верхня 95%"))
+#| results: asis
+for (key in c("weight1000","year")) {
+  z <- ci[term==key]
+  title <- if(key=="weight1000") "H1 · +1000 фунтів" else "H2 · +1 модельний рік"
+  cat(sprintf('<article class="hypothesis"><span class="tag">%s</span><div class="estimate">%s <small>mpg</small></div><div class="interval">95%%: %s … %s mpg</div><p>За однакових інших предикторів у M1.</p></article>',title,fmt(z$estimate),fmt(z$lower),fmt(z$upper)))
+}
+```
+```{=html}
+</div><div class="note">Інтервали враховують кластери назв. Це умовні <b>асоціації</b>, а не причинні ефекти.</div><div class="footnote">Гіпотези розвідувальні після повного EDA. Якість прогнозу перевіряємо окремо на наступному слайді.</div>
 ```
 
-**Маса:** близько −5,62 mpg на +1000 фунтів за однакових решти предикторів.
+## Тест: прогноз точніший за константу {.chart-slide .test-result}
 
-**Рік:** близько +0,73 mpg на один модельний рік.
-
-Напрями підтримуються; інтервали враховують кластеризацію за назвами. Це асоціації в розвідувальному аналізі, не причинні ефекти.
-
-## Test: RMSE `r round(r$RMSE,2)` mpg
-
-::: {.columns}
-::: {.column width="65%"}
+```{=html}
+<div class="eyebrow">08 / відкладені 82 записи</div><div class="visual-grid"><div class="figure-box transparent">
+```
 ```{r}
-knitr::include_graphics(normalizePath("outputs/figures/07_test_predictions.png", winslash="/"))
+#| results: asis
+b <- ""
+sx <- function(x) 100+(x-5)/45*680
+sy <- function(x) 420-(x-5)/45*350
+for (v in c(10,20,30,40)) b <- paste0(b,
+  sprintf('<line x1="100" y1="%s" x2="780" y2="%s" stroke="#e3dce9"/>',sy(v),sy(v)),
+  svg_text(80,sy(v)+7,v,23,anchor="end"),svg_text(sx(v),460,v,23,anchor="middle"))
+b <- paste0(b,sprintf('<line x1="%s" y1="%s" x2="%s" y2="%s" stroke="#8e829d" stroke-dasharray="8 8" stroke-width="2"/>',sx(5),sy(5),sx(50),sy(50)))
+for (i in seq_len(nrow(pred))) b <- paste0(b,sprintf('<circle cx="%.1f" cy="%.1f" r="6" fill="#d65b35" opacity=".8"><title>Факт %.2f; прогноз %.2f mpg</title></circle>',sx(pred$actual[i]),sy(pred$predicted[i]),pred$actual[i],pred$predicted[i]))
+svg(paste0(b,svg_text(100,30,"Прогноз, mpg",24),svg_text(780,505,"Фактичний mpg",24,anchor="end")),"Фактичний і прогнозований mpg на 82 тестових спостереженнях")
 ```
-:::
-::: {.column width="35%"}
-::: {.metric}
-`r round(r$MAE,2)`
-:::
-MAE, mpg
-
-Константа: RMSE **`r round(r$baseline_RMSE,2)`**.
-
-Зниження RMSE: **`r round(r$improvement_percent,1)`%**.
-
-Test не використовувався для вибору специфікації.
-:::
-:::
-
-## Найекономніші авто — складніші для прогнозу
-
+```{=html}
+</div><div class="insight"><span class="tag">МОДЕЛЬ M2</span>
+```
 ```{r}
-knitr::kable(errs,digits=2,col.names=c("Фактичний mpg","n","MAE","RMSE","Зміщення"))
+#| results: asis
+cat(sprintf('<div class="hero-number">%s</div><div class="unit">RMSE, mpg</div><div class="metric-row"><b>%s</b><span>MAE, mpg</span></div><div class="metric-row"><b>%s</b><span>RMSE константи</span></div><div class="accent-note">−%s%% RMSE проти константи</div>',fmt(r$RMSE),fmt(r$MAE),fmt(r$baseline_RMSE),fmt(r$improvement_percent,1)))
+```
+```{=html}
+</div></div><div class="footnote">Специфікацію зафіксовано до оцінювання test. Пунктир — ідеальний збіг прогнозу й факту.</div>
 ```
 
-Для mpg >30 прогноз у середньому занижений приблизно на **2,45 mpg**.
+## Найбільші помилки — для mpg понад 30 {.errors}
 
-Лише 16 записів у цій групі. Після аналізу помилок модель не змінювалась.
+```{=html}
+<div class="eyebrow">09 / де прогноз слабший</div><div class="error-grid">
+```
+```{r}
+#| results: asis
+for(i in seq_len(nrow(errs))) {
+  z <- errs[i]
+  cat(sprintf('<article class="error-card %s"><span class="tag">%s · n = %d</span><strong>%s</strong><span>RMSE, mpg</span><div class="interval">Зміщення: %s mpg</div></article>',if(i==3) 'highlight' else '',z$range,z$n,fmt(z$RMSE),fmt(z$bias)))
+}
+```
+```{=html}
+</div><div class="note">Для найекономніших авто модель <b>занижує</b> mpg приблизно на 2,45 у середньому.</div><div class="footnote">У цій підгрупі лише 16 записів. Після огляду помилок модель не змінювалася.</div>
+```
 
-## Висновок і наступний крок
+## Модель корисна в межах цих даних {.closing}
 
-**M2 точніша за константу на відкладених назвах**, але помилки й неоднаковий розкид залишаються.
-
-Маса та рік мають очікувані умовні асоціації в M1. Причинність не встановлено.
-
-Межі: історична вибірка, попередній EDA всього набору, неповні характеристики й недосконале групування споріднених авто.
-
-**Наступна перевірка:** зафіксована модель на справді нових моделях за тим самим протоколом вимірювання.
-
-::: {.sources}
-[DOE FOTW №1289](https://www.energy.gov/cmei/vehicles/articles/fotw-1289-may-8-2023-new-vehicle-fuel-economy-improved-33-1980-2022-while) · [EPA Trends 2025](https://www.epa.gov/system/files/documents/2026-02/420r26001.pdf) · [UCI Auto MPG](https://doi.org/10.24432/C5859H). Повна бібліографія — у звіті.
-:::
+```{=html}
+<div class="eyebrow">10 / висновок</div>
+<div class="closing-grid"><div><h3>Що отримали</h3><p class="closing-lead">M2 точніша за константу.<br>Маса й рік мають очікувані умовні зв’язки у M1.</p></div><div><h3>Що обмежує висновок</h3><p>Історична вибірка. Попередній EDA всього набору. Неповні характеристики та споріднені моделі.</p></div></div>
+<div class="next-step"><span class="tag">НАСТУПНИЙ КРОК</span><p>Перевірити зафіксовану модель на справді нових даних за тим самим протоколом вимірювання.</p></div>
+<div class="footnote">Quinlan (1993), Auto MPG, DOI: 10.24432/C5859H · DOE FOTW №1289 (2023) · EPA Automotive Trends 2025 (2026). Повні джерела й обмеження — у звіті.</div>
+```
