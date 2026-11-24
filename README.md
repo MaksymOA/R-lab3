@@ -4,6 +4,8 @@
 
 **Репозиторій:** https://github.com/MaksymOA/R-lab3
 
+**Онлайн:** [звіт](https://maksymoa.github.io/R-lab3/reports/Regression.html) · [слайди](https://maksymoa.github.io/R-lab3/reports/Presentation.html).
+
 - [Виконаний Quarto-звіт](reports/Regression.html) та [його джерело](reports/Regression.qmd). Один виконуваний `.qmd` слугує і ноутбуком, і джерелом звіту, як дозволено завданням.
 - [Слайди](reports/Presentation.html) та [редаговане джерело Revealjs](reports/Presentation.qmd).
 - `outputs/tables/` — поділ, folds, метрики CV/test, коефіцієнти та діагностика.
