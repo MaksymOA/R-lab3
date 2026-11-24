@@ -1,0 +1,284 @@
+---
+title: "Лабораторна №3: прогноз паливної економічності"
+subtitle: "Від EDA до перевірки регресійної моделі"
+author: "Басок Максим"
+format:
+  html:
+    embed-resources: true
+    toc: true
+    number-sections: true
+    code-fold: true
+    theme: cosmo
+    highlight-style: github
+execute:
+  echo: true
+---
+
+# Вступ
+
+Продовжую ЛР №2 на **тому самому Auto MPG** з ціллю **mpg** — кількість миль на американський галон у міському циклі. Більше mpg означає кращу економічність. Рядок — запис про автомобільну модель; назви повторюються в різних записах.
+
+**Питання:** наскільки точно можна передбачити міський mpg для ще не представлених назв автомобільних моделей того самого історичного періоду, якщо до вимірювання mpg відомі маса, паспортна потужність, модельний рік та походження? Це не прогноз для сучасних авто чи майбутніх років. Усі предиктори передбачаються відомими до цільового випробування; mpg і похідні від нього серед предикторів відсутні.
+
+## Предметні джерела та очікування
+
+**DOE, FOTW №1289 (2023)** пояснює, що більша маса й вимоги до потужності пов’язані з енергоспоживанням, але розвиток технологій дозволяє одночасно підвищувати економічність і потужність. Це обґрунтовує включення маси та потужності й позитивне очікування щодо модельного року; водночас технічний прогрес забороняє переносити історичні коефіцієнти на сучасні авто без перевірки.
+
+**EPA, Automotive Trends Report 2025 (опублікований у 2026)** описує одночасні зміни економічності, маси, потужності та структури типів автомобілів, зокрема швидке зростання економічності наприкінці 1970-х. Це підказує контролювати рік і склад вибірки. На відміну від нашого набору моделей, агрегати EPA враховують продажі/виробництво: це контекст, а не незалежна перевірка нашої моделі.
+
+Обидва джерела підтримують багатофакторний опис. DOE акцентує енерговитрати й технології, EPA — історичну динаміку та склад автопарку. Вони не доводять причинний ефект конкретного коефіцієнта в Auto MPG. Методологічно використовую рекомендацію NIST аналізувати залишки, а не покладатися лише на R². Посилання наведені наприкінці.
+
+## Гіпотези до оцінювання
+
+Гіпотези виникли з EDA ЛР №2 на всьому наборі, тому їхня перевірка **розвідувальна**.
+
+1. **H1:** у зафіксованій базовій моделі `mpg ~ weight1000 + horsepower100 + year + origin` коефіцієнт маси від’ємний за врахування решти предикторів. Перевіряю знак, величину та 95% кластерний довірчий інтервал. Одиниця зміни маси — 1000 фунтів.
+2. **H2:** у тій самій моделі коефіцієнт модельного року додатний. Перевіряю оцінку зміни mpg на один рік та 95% кластерний інтервал. Рік — характеристика моделі, а не причинний вплив часу.
+
+# Методи
+
+## Залежності та дані
+
+Залежності зафіксовано в `renv.lock`. Код міститься в цьому виконуваному Quarto-документі; він одночасно є ноутбуком і джерелом звіту.
+
+```{r}
+#| label: setup
+if (.Platform$OS.type == "windows") Sys.setlocale("LC_CTYPE", "Ukrainian_Ukraine.utf8")
+suppressPackageStartupMessages({library(data.table); library(ggplot2); library(jsonlite)})
+options(width=110)
+for (p in c("outputs/tables", "outputs/figures", "outputs/metadata", "data/processed"))
+  dir.create(p, recursive=TRUE, showWarnings=FALSE)
+show <- function(x, digits=3) knitr::kable(as.data.frame(x), digits=digits, row.names=FALSE)
+save_table <- function(x, name) fwrite(x, file.path("outputs/tables", paste0(name,".csv")))
+save_plot <- function(p, name, width=9, height=5) {
+  ggsave(file.path("outputs/figures",paste0(name,".png")), p, width=width,height=height,dpi=150)
+  print(p)
+}
+theme_set(theme_minimal(base_size=13))
+fields <- c("mpg","cylinders","displacement","horsepower","weight","acceleration","model_year","origin","car_name")
+d <- as.data.table(read.table("data/raw/auto-mpg.data", header=FALSE, quote='"',
+  na.strings="?", col.names=fields, stringsAsFactors=FALSE))
+d[, `:=`(row_id=.I, group=tolower(trimws(car_name)),
+         origin=factor(origin, levels=1:3, labels=c("USA","Europe","Japan")))]
+stopifnot(nrow(d)==398, !anyNA(d$mpg), sum(is.na(d$horsepower))==6,
+          !anyDuplicated(d[,..fields]), all(d$weight>0), all(d$mpg>0))
+```
+
+Джерело: Quinlan, R. (1993), **Auto MPG**, UCI, DOI [10.24432/C5859H](https://doi.org/10.24432/C5859H), ліцензія **CC BY 4.0**. Використано точну копію сирого файлу ЛР №2, отриману 17.11.2026; її SHA-256 збережено в метаданих. 398 записів, 9 початкових полів, шість невідомих horsepower. UCI до публікації цієї версії вилучив 8 записів із невідомим mpg. Дані історичні (1970–1982), вибірка не зважена за продажами.
+
+## План поділу й валідації
+
+**До підбору моделей:** seed `312024`; близько 80% унікальних назв — навчання, решта — тест. Одна назва не перетинає поділ. Це консервативний захист від повторів; написання назв не гарантує повного відокремлення споріднених платформ/брендів. Прогнозування пізніших років потребувало б іншого, часового поділу.
+
+Основна метрика — **RMSE у mpg**: великі помилки важливі й отримують більшу вагу. MAE теж подаю в mpg. Порівнюю середнє і SD метрик на однаковій **5-fold груповій CV, повтореній тричі**, тільки в навчанні. SD — варіабельність розбиттів, не довірчий інтервал: повторні folds залежні. Обираю найменший середній RMSE, при точній нічиїй — простішу модель. Після вибору один раз оцінюю обрану модель й константу на тесті.
+
+**Межа незалежності:** у ЛР №2 весь Auto MPG уже було переглянуто; звідти взято предиктори й ідею кривизни. Тест нижче відокремлено від поточного підбору, але він не є повністю новим зовнішнім підтвердженням. Справді незалежних нових даних у цій роботі немає.
+
+```{r}
+#| label: split
+set.seed(312024)
+groups <- sort(unique(d$group))
+train_groups <- sample(groups, floor(.8*length(groups)))
+train <- copy(d[group %in% train_groups])
+test <- copy(d[!group %in% train_groups])
+stopifnot(length(intersect(train$group,test$group))==0)
+split <- d[,.(row_id,group,part=ifelse(group %in% train_groups,"train","test"))]
+save_table(split,"split")
+show(split[,.(rows=.N,groups=uniqueN(group)),by=part])
+folds <- rbindlist(lapply(1:3,function(repeat_id) {
+  set.seed(312024+repeat_id)
+  g <- sample(sort(unique(train$group)))
+  data.table(group=g,repeat_id=repeat_id,fold=rep(1:5,length.out=length(g)))
+}))
+save_table(folds,"cv_groups")
+```
+
+## Стислий EDA лише навчання
+
+За ЛР №2 очікуємо праві хвости маси/потужності, від’ємний зв’язок маси з mpg і його кривизну. Нижче повторно оглядаю **лише навчання**: пропуски не замінюю до валідації; крайні реальні авто не видаляю механічно.
+
+```{r}
+#| label: eda
+train_summary <- train[,.(rows=.N,groups=uniqueN(group),mpg_mean=mean(mpg),mpg_median=median(mpg),
+  mpg_sd=sd(mpg),mpg_min=min(mpg),mpg_max=max(mpg),horsepower_missing=sum(is.na(horsepower)))]
+show(train_summary); save_table(train_summary,"train_summary")
+save_plot(ggplot(train,aes(mpg))+geom_histogram(binwidth=2,fill="#087e8b",color="white")+
+  labs(title="Навчання: розподіл mpg",x="Міська економічність, mpg",y="Записи"),"01_eda_target")
+save_plot(ggplot(train,aes(weight,mpg,color=origin))+geom_point(alpha=.7)+
+  labs(title="Навчання: маса та mpg",x="Маса, фунти",y="mpg",color="Походження"),"02_eda_weight")
+save_plot(ggplot(train,aes(origin,mpg,fill=origin))+geom_boxplot(show.legend=FALSE)+
+  labs(title="Навчання: групові відмінності",x="Походження",y="mpg"),"03_eda_origin")
+```
+
+Гістограма допомагає оцінити діапазон задачі. Спадна хмара маса–mpg підказує масу для базової моделі, а її вигин — квадратний член для модифікації. Регіональні відмінності розглядаю разом із масою й роком: boxplot сам по собі не встановлює ефект походження. Нульова механічна обрізка чи видалення країв не виконуються.
+
+## Моделі й передобробка
+
+**Орієнтир:** середнє mpg навчальної частини кожного fold. **Базова M1:** маса, потужність, рік, походження. **Модифікована M2:** та сама формула плюс квадрат маси — одна заздалегідь визначена спроба врахувати кривизну. Не підбираю десятки специфікацій. Кількість циліндрів та об’єм не додаю через перекриття інформації з масою/потужністю, помічене в EDA.
+
+Медіану horsepower оцінюю **тільки на analysis-частині кожного fold**, потім застосовую до assessment. Після CV — медіана всього train для train і test. Масу ділю на 1000, потужність на 100, рік центрую відносно 1976: це фіксовані одиниці, не параметри, оцінені з усього набору. Походження має фіксований довідник; базова категорія USA.
+
+```{r}
+#| label: model-functions
+prepare <- function(x,hp_median) {
+  x <- copy(x)
+  x[is.na(horsepower),horsepower:=hp_median]
+  x[,`:=`(weight1000=weight/1000-3,horsepower100=horsepower/100,year=model_year-76)]
+  x
+}
+formulas <- list(M1=mpg~weight1000+horsepower100+year+origin,
+                 M2=mpg~weight1000+I(weight1000^2)+horsepower100+year+origin)
+metrics <- function(actual,predicted) data.table(
+  RMSE=sqrt(mean((actual-predicted)^2)), MAE=mean(abs(actual-predicted)))
+cv <- rbindlist(lapply(1:3,function(r) rbindlist(lapply(1:5,function(k) {
+  assessment_groups <- folds[repeat_id==r & fold==k,group]
+  a <- train[!group %in% assessment_groups]; b <- train[group %in% assessment_groups]
+  stopifnot(length(intersect(a$group,b$group))==0)
+  med <- median(a$horsepower,na.rm=TRUE)
+  a <- prepare(a,med); b <- prepare(b,med)
+  results <- list(cbind(data.table(model="Mean"),metrics(b$mpg,rep(mean(a$mpg),nrow(b)))))
+  for (name in names(formulas)) {
+    fit <- lm(formulas[[name]],data=a)
+    results[[length(results)+1]] <- cbind(data.table(model=name),metrics(b$mpg,predict(fit,b)))
+  }
+  ans <- rbindlist(results)
+  ans[,`:=`(repeat_id=r,fold=k,assessment_rows=nrow(b),hp_median=med)]
+  ans
+}))))
+cv_summary <- cv[,.(RMSE_mean=mean(RMSE),RMSE_sd=sd(RMSE),MAE_mean=mean(MAE),MAE_sd=sd(MAE)),by=model]
+save_table(cv,"cv_fold_metrics"); save_table(cv_summary,"cv_summary")
+show(cv_summary[order(RMSE_mean)])
+selected <- cv_summary[model %in% c("M1","M2")][order(RMSE_mean,model)]$model[1]
+write_json(list(selected=selected,criterion="minimum mean grouped CV RMSE",seed=312024,
+  formulas=vapply(formulas,function(f) paste(deparse(f),collapse=" "),character(1)),
+  stage="selection locked before test scoring"),"outputs/metadata/selection.json",auto_unbox=TRUE,pretty=TRUE)
+hp_median <- median(train$horsepower,na.rm=TRUE)
+a <- prepare(train,hp_median)
+fits <- lapply(formulas,lm,data=a)
+final <- fits[[selected]]
+cat("Обрано за CV:",selected,"\n")
+```
+
+Обрано **`r selected`**. Різниця середніх RMSE між M1 і M2 становить **`r round(abs(diff(cv_summary[model %in% c('M1','M2'), RMSE_mean])),3)` mpg**. Порівняння відбувається на спільних folds; воно не означає, що таку саму перевагу гарантовано отримаємо в іншій вибірці. Далі специфікація не змінюється за тестовими результатами.
+
+# Результати
+
+## Коефіцієнти та гіпотези
+
+Гіпотези перевіряю в **заздалегідь визначеній M1**, навіть якщо CV обрала M2. Для повторів назв використовую кластерну sandwich-коваріацію CR1 з t-критичним значенням за G−1 ступенями свободи (G — кількість назв у train). Це наближення допускає неоднаковий розкид і залежність усередині назви, але не усуває зміщення пропущених факторів чи наслідки попереднього EDA.
+
+```{r}
+#| label: inference
+cluster_ci <- function(fit,groups) {
+  X <- model.matrix(fit); e <- residuals(fit)
+  scores <- rowsum(X*as.numeric(e),groups,reorder=FALSE)
+  G <- nrow(scores); n <- nrow(X); p <- ncol(X)
+  bread <- solve(crossprod(X))
+  covariance <- G/(G-1)*(n-1)/(n-p)*bread%*%crossprod(scores)%*%bread
+  se <- sqrt(diag(covariance)); critical <- qt(.975,G-1)
+  data.table(term=names(coef(fit)),estimate=coef(fit),cluster_se=se,
+             lower=coef(fit)-critical*se,upper=coef(fit)+critical*se)
+}
+coefficients <- cluster_ci(fits$M1,a$group)
+save_table(coefficients,"baseline_coefficients_cluster95")
+show(coefficients)
+h1 <- coefficients[term=="weight1000"]
+h2 <- coefficients[term=="year"]
+```
+
+**H1:** за незмінних потужності, року й походження +1000 фунтів асоційовані зі зміною **`r round(h1$estimate,2)` mpg** (95% кластерний інтервал **`r round(h1$lower,2)`; `r round(h1$upper,2)`**). Це `r if(h1$upper<0) 'підтримує очікуваний від’ємний напрям' else 'не дає однозначного підтвердження від’ємного напряму'` у M1.
+
+**H2:** на один модельний рік оцінена зміна **`r round(h2$estimate,2)` mpg** (**`r round(h2$lower,2)`; `r round(h2$upper,2)`**). Це `r if(h2$lower>0) 'підтримує очікуваний додатний напрям' else 'не дає однозначного підтвердження додатного напряму'`. Інтервали не перетворюють розвідувальні гіпотези на незалежне підтвердження; коефіцієнти не є причинними ефектами.
+
+## Діагностика на навчанні
+
+```{r}
+#| label: diagnostics
+diagnostics <- rbindlist(lapply(names(fits),function(name) {
+  f <- fits[[name]]
+  data.table(model=name,row_id=a$row_id,group=a$group,fitted=fitted(f),residual=residuals(f),
+    standardized=rstandard(f),cook=cooks.distance(f))
+}))
+save_table(diagnostics,"training_diagnostics")
+save_plot(ggplot(diagnostics,aes(fitted,residual))+geom_point(alpha=.55)+
+  geom_hline(yintercept=0,color="#b34b38")+geom_smooth(method="loess",se=FALSE,color="#087e8b")+
+  facet_wrap(~model)+labs(title="Залишки проти прогнозів: лише навчання",x="Прогноз, mpg",y="Залишок, mpg"),"04_residuals")
+save_plot(ggplot(diagnostics,aes(fitted,sqrt(abs(standardized))))+geom_point(alpha=.55)+
+  geom_smooth(method="loess",se=FALSE,color="#087e8b")+facet_wrap(~model)+
+  labs(title="Scale–location: чи змінюється розкид?",x="Прогноз, mpg",y="√|стандартизований залишок|"),"05_scale_location")
+save_plot(ggplot(diagnostics,aes(sample=standardized))+stat_qq(alpha=.5)+stat_qq_line()+
+  facet_wrap(~model)+labs(title="Q–Q залишків",x="Теоретичний квантиль",y="Стандартизований залишок"),"06_qq")
+influence <- diagnostics[cook>4/nrow(a)][order(-cook)]
+save_table(influence,"influential_training_rows")
+show(influence[1:min(8,.N),.(model,row_id,cook,residual)])
+X <- model.matrix(fits$M1)
+vif <- data.table(term=colnames(X)[-1],VIF=vapply(2:ncol(X),function(j)
+  1/(1-summary(lm(X[,j]~X[,-c(1,j)]))$r.squared),numeric(1)))
+show(vif);save_table(vif,"baseline_vif")
+```
+
+Вигин гладкої лінії на графіку залишків означає невраховану форму; квадрат маси у M2 спрямований саме на цю проблему. Зміна висоти хмари/scale–location вказує на можливу гетероскедастичність. Відхилення хвостів Q–Q обмежують звичайні нормальні інтервали. Для коефіцієнтів тому подано кластерні інтервали; **індивідуальні прогнозні інтервали не заявляються**.
+
+**Що видно в наших результатах:** M1 має виразний U-подібний вигин залишків; у M2 він слабший, проте не зникає повністю. Scale–location в обох моделях показує більший розкид для великих прогнозів mpg. Верхні хвости Q–Q відхиляються від прямої: лишаються великі додатні залишки. Отже, M2 покращує форму середнього прогнозу, але не усуває всіх порушень. VIF маси близько 5,15, потужності — 4,67: їхні умовні коефіцієнти слід інтерпретувати разом із невизначеністю.
+
+Поріг Cook 4/n — сигнал для огляду, не наказ видалити дані. Знайдено **`r nrow(influence)` модель-рядків** вище цього порога (той самий запис може бути позначений в обох моделях). Вони збережені; крайні реальні автомобілі впливають на OLS і можуть бути важкими для прогнозу. VIF показує, наскільки коефіцієнти залежать від спільної інформації факторів; це ще одна причина обережної інтерпретації маси та потужності.
+
+## Зафіксована фінальна перевірка
+
+```{r}
+#| label: held-out-test
+# Перший і єдиний етап оцінювання test: специфікацію вже записано в selection.json.
+b <- prepare(test,hp_median)
+predictions <- b[,.(row_id,group,actual=mpg)]
+predictions[,`:=`(predicted=as.numeric(predict(final,b)),baseline=mean(a$mpg))]
+predictions[,`:=`(error=actual-predicted,abs_error=abs(actual-predicted))]
+test_metrics <- rbindlist(list(cbind(data.table(model="Mean"),metrics(b$mpg,predictions$baseline)),
+  cbind(data.table(model=selected),metrics(b$mpg,predictions$predicted))))
+save_table(test_metrics,"test_metrics");save_table(predictions,"test_predictions")
+show(test_metrics)
+save_plot(ggplot(predictions,aes(actual,predicted))+geom_point(color="#087e8b",size=2)+
+  geom_abline(slope=1,intercept=0,linetype=2)+coord_equal()+
+  labs(title=paste("Test: факт і прогноз",selected),x="Фактичний mpg",y="Прогнозований mpg"),"07_test_predictions")
+predictions[,range:=cut(actual,c(-Inf,20,30,Inf),labels=c("mpg ≤20","20<mpg≤30","mpg>30"))]
+errors <- predictions[,.(n=.N,MAE=mean(abs_error),RMSE=sqrt(mean(error^2)),bias=mean(predicted-actual)),by=range]
+save_table(errors,"test_error_groups");show(errors)
+show(predictions[order(-abs_error)][1:min(5,.N),.(row_id,actual,predicted,abs_error)])
+saveRDS(list(model=final,hp_median=hp_median,selected=selected),"outputs/final_model.rds")
+fwrite(prepare(d,hp_median),"data/processed/prepared_data.csv")
+summary_result <- list(selected=selected,train_rows=nrow(a),test_rows=nrow(b),
+  train_groups=uniqueN(a$group),test_groups=uniqueN(b$group),
+  RMSE=test_metrics[model==selected,RMSE],MAE=test_metrics[model==selected,MAE],
+  baseline_RMSE=test_metrics[model=="Mean",RMSE],
+  improvement_percent=100*(1-test_metrics[model==selected,RMSE]/test_metrics[model=="Mean",RMSE]),
+  H1=as.list(h1),H2=as.list(h2))
+write_json(summary_result,"outputs/metadata/results.json",pretty=TRUE,auto_unbox=TRUE)
+writeLines(capture.output(sessionInfo()),"outputs/metadata/session_info.txt")
+stopifnot(all(is.finite(predictions$predicted)),nrow(test_metrics)==2,
+          !anyDuplicated(split$row_id),nrow(cv)==45,
+          length(intersect(train$group,test$group))==0)
+```
+
+Фінальна **`r selected`** має RMSE **`r round(summary_result$RMSE,2)` mpg** і MAE **`r round(summary_result$MAE,2)` mpg**; константа — RMSE **`r round(summary_result$baseline_RMSE,2)` mpg**. Відносна зміна RMSE — **`r round(summary_result$improvement_percent,1)`% покращення**. Це результат конкретного відкладеного поділу; додаткового вибору моделі за ним не виконано.
+
+У таблиці помилок групи задані за фактичним mpg лише для післятестового опису. Додатний bias означає завищення прогнозів, від’ємний — заниження. Найгірша за RMSE група тут — **`r as.character(errors[which.max(RMSE),range])`** (n = **`r errors[which.max(RMSE),n]`**). Невеликі групи не дають стабільних порівнянь. Великі помилки можуть виникати через відсутні технічні характеристики та крайні поєднання ознак; модель після цього аналізу не переналаштовувалась.
+
+# Обговорення та висновки
+
+Ми отримали перевірювану оцінку прогнозу для відкладених назв автомобілів у межах історичного набору. Напрями й невизначеність H1/H2 наведено вище для M1, а якість прогнозу — окремо для вибраної за CV моделі. Хороший прогноз не означає причинного пояснення коефіцієнтів.
+
+Практична відповідь на головне питання: для 82 відкладених записів обрана M2 має типову абсолютну помилку близько 1,95 mpg і RMSE близько 2,78 mpg. Вона точніша за константу на цьому поділі, але для економних авто понад 30 mpg помилки більші, і прогнози в середньому занижені. H1 і H2 підтримують відповідно від’ємну асоціацію маси й додатну асоціацію року в базовій M1, з інтервалами, що не перетинають нуль. Через попередній EDA це розвідувальні, а не незалежно підтверджені результати.
+
+Немає випадкового експерименту, даних про технології двигуна та всіх споріднених платформ. Імпутація медіаною не враховує невизначеність відсутньої потужності. Кластер за точною назвою лише частково відбиває залежності. CV та test захищені від поточного витоку, але попередній повний EDA обмежує незалежність дослідження. Висновки не поширюються автоматично на сучасні авто, нові технології чи реальні умови конкретного водія.
+
+**Конкретне продовження:** зафіксувати формулу та передобробку й перевірити їх на справді новому наборі того самого протоколу випробування з розділенням за сімействами моделей; для прогнозу майбутніх років застосувати часовий test.
+
+# Бібліографія
+
+1. Quinlan, R. (1993). Auto MPG. UCI. [DOI:10.24432/C5859H](https://doi.org/10.24432/C5859H). CC BY 4.0.
+2. U.S. DOE (2023). [FOTW №1289: New Vehicle Fuel Economy Improved by 33% from 1980 to 2022 while Performance Increased](https://www.energy.gov/cmei/vehicles/articles/fotw-1289-may-8-2023-new-vehicle-fuel-economy-improved-33-1980-2022-while).
+3. U.S. EPA (2026). [2025 Automotive Trends Report, EPA-420-R-26-001](https://www.epa.gov/system/files/documents/2026-02/420r26001.pdf). Предметний контекст, не джерело навчальних даних.
+4. NIST/SEMATECH. [How can I tell if a model fits my data?](https://www.itl.nist.gov/div898/handbook/pmd/section4/pmd44.htm).
+5. James et al. [An Introduction to Statistical Learning](https://www.statlearning.com/). Розділи про регресію та валідацію.
+6. [Quarto: Using R](https://quarto.org/docs/computations/r.html).
+
+Приклади DataCamp, надані викладачем: [OLS](https://app.datacamp.com/learn/tutorials/ols-regression), [simple regression](https://app.datacamp.com/learn/tutorials/simple-linear-regression), [R regression](https://app.datacamp.com/learn/tutorials/linear-regression-R), [multiple regression](https://app.datacamp.com/learn/tutorials/multiple-linear-regression-r-tutorial). Доступ через середовище підготовки був обмежений; їх не використано як підтвердження предметних висновків.

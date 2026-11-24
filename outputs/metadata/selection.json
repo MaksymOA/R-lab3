@@ -1,0 +1,7 @@
+{
+  "selected": "M2",
+  "criterion": "minimum mean grouped CV RMSE",
+  "seed": 312024,
+  "formulas": ["mpg ~ weight1000 + horsepower100 + year + origin", "mpg ~ weight1000 + I(weight1000^2) + horsepower100 + year + origin"],
+  "stage": "selection locked before test scoring"
+}

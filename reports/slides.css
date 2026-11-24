@@ -1,0 +1,18 @@
+:root { --r-main-font: "Segoe UI", Arial, sans-serif; --r-heading-font: "Segoe UI", Arial, sans-serif; --r-main-color:#193644; --r-heading-color:#123242; --r-link-color:#087e8b; --r-background-color:#fafcfb; --r-main-font-size:32px; }
+.reveal h1 {font-size:2.4em;letter-spacing:-.045em;line-height:1.12}
+.reveal h2 {font-size:1.65em;letter-spacing:-.025em;text-transform:none;border-bottom:4px solid #087e8b;padding-bottom:24px;margin-bottom:32px}
+.reveal h3 {font-size:1.05em;color:#087e8b;text-transform:none}
+.reveal p,.reveal li {line-height:1.45}
+.reveal .column {padding-right:35px}
+.reveal .columns {display:flex!important;gap:24px;align-items:flex-start}
+.reveal .column {min-width:0;box-sizing:border-box}
+.reveal img {max-height:560px;margin:0;object-fit:contain}
+.reveal table {font-size:.85em;width:100%;margin-bottom:28px}
+.reveal table th {color:#087e8b;border-bottom:2px solid #087e8b}
+.reveal table td,.reveal table th {padding:15px 18px}
+.metric {font-size:3.5em;line-height:1.1;font-weight:700;color:#087e8b;letter-spacing:-.05em;margin:20px 0}
+.sources {font-size:.55em;color:#57717e;margin-top:30px}
+.reveal .slide-number {font-size:18px;background:#123242;color:white;padding:10px}
+#title-slide {text-align:left}
+#title-slide h1 {max-width:1100px}
+#title-slide .subtitle {color:#087e8b;font-size:1.15em}

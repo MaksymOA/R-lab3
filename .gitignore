@@ -1,0 +1,13 @@
+/.quarto/
+/renv/
+/docs/
+/outputs/metadata/verification/
+/outputs/metadata/*preview*.png
+**/*_files/
+**/*.knit.md
+.Rhistory
+.RData
+Rplots.pdf
+__pycache__/
+
+**/*.quarto_ipynb

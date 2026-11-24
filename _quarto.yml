@@ -1,0 +1,12 @@
+project:
+  type: default
+  execute-dir: project
+  render:
+    - reports/Regression.qmd
+    - reports/Presentation.qmd
+lang: uk
+execute:
+  freeze: false
+  cache: false
+  warning: false
+  message: false

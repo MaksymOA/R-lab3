@@ -1,0 +1,25 @@
+{
+  "selected": "M2",
+  "train_rows": 316,
+  "test_rows": 82,
+  "train_groups": 244,
+  "test_groups": 61,
+  "RMSE": 2.7756,
+  "MAE": 1.9472,
+  "baseline_RMSE": 8.2928,
+  "improvement_percent": 66.53,
+  "H1": {
+    "term": "weight1000",
+    "estimate": -5.6243,
+    "cluster_se": 0.484,
+    "lower": -6.5776,
+    "upper": -4.671
+  },
+  "H2": {
+    "term": "year",
+    "estimate": 0.7291,
+    "cluster_se": 0.0537,
+    "lower": 0.6232,
+    "upper": 0.8349
+  }
+}

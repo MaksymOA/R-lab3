@@ -1,0 +1,201 @@
+---
+title: "Прогноз паливної економічності"
+subtitle: "Лабораторна робота №3 · Auto MPG"
+author: "Басок Максим"
+format:
+  revealjs:
+    embed-resources: true
+    theme: simple
+    css: slides.css
+    slide-number: true
+    transition: fade
+    width: 1600
+    height: 900
+    margin: 0.07
+    center: false
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| include: false
+if (.Platform$OS.type == "windows") Sys.setlocale("LC_CTYPE", "Ukrainian_Ukraine.utf8")
+library(data.table)
+library(jsonlite)
+r <- fromJSON("outputs/metadata/results.json")
+cv <- fread("outputs/tables/cv_summary.csv")
+test <- fread("outputs/tables/test_metrics.csv")
+ci <- fread("outputs/tables/baseline_coefficients_cluster95.csv")
+errs <- fread("outputs/tables/test_error_groups.csv")
+```
+
+## Чи можна спрогнозувати mpg нової моделі?
+
+::: {.columns}
+::: {.column width="55%"}
+**Ціль:** міська економічність у милях на галон США.
+
+**Прогноз:** для відкладених назв авто того самого історичного періоду.
+
+Маса · потужність · рік · походження.
+:::
+::: {.column width="45%"}
+::: {.metric}
+398
+:::
+записів · 1970–1982
+
+[UCI Auto MPG](https://doi.org/10.24432/C5859H) · CC BY 4.0
+:::
+:::
+
+## Два очікування з EDA та літератури
+
+::: {.columns}
+::: {.column width="50%"}
+### H1: маса ↓ mpg
+
+Коефіцієнт +1000 фунтів від’ємний за врахування потужності, року й походження.
+:::
+::: {.column width="50%"}
+### H2: рік ↑ mpg
+
+Пізніший модельний рік пов’язаний із вищим mpg за решти предикторів.
+:::
+:::
+
+DOE (2023) підкреслює роль маси й технологій; EPA (2026) — зміну складу автопарку.
+
+**Перевірка:** коефіцієнти M1 та 95% кластерні інтервали. Гіпотези розвідувальні: весь набір уже переглядався в ЛР №2.
+
+## Маса підказує нелінійний член
+
+::: {.columns}
+::: {.column width="70%"}
+```{r}
+knitr::include_graphics(normalizePath("outputs/figures/02_eda_weight.png", winslash="/"))
+```
+:::
+::: {.column width="30%"}
+Графік побудовано **тільки на train**.
+
+Спадний зв’язок і кривизна → маса у M1 та квадрат маси у M2.
+
+Регіон не трактуємо як причинний фактор.
+:::
+:::
+
+## Перевірка за назвами автомобілів
+
+::: {.columns}
+::: {.column width="50%"}
+### Навчання
+
+**`r r$train_rows` записів · `r r$train_groups` назв**
+
+5-fold CV × 3 повтори.
+
+Спільні folds для всіх моделей. Медіана потужності лише з analysis-частини.
+:::
+::: {.column width="50%"}
+### Test
+
+**`r r$test_rows` записи · `r r$test_groups` назва**
+
+Вибір фіксуємо **до оцінювання test**.
+
+Основна метрика — RMSE; додаткова — MAE. Обидві у mpg.
+:::
+:::
+
+Назви не перетинають поділ. Незалежність від попереднього EDA обмежена.
+
+## Квадрат маси покращив CV
+
+```{r}
+knitr::kable(cv,digits=2,col.names=c("Модель","RMSE середнє","RMSE SD","MAE середнє","MAE SD"))
+```
+
+**Mean:** середнє train. **M1:** маса + потужність + рік + походження.
+
+**M2:** M1 + квадрат маси. Обрано **`r r$selected`** за найменшим середнім RMSE.
+
+SD відбиває розкид між folds, а не довірчий інтервал.
+
+## Покращення не усунуло всіх проблем
+
+::: {.columns}
+::: {.column width="70%"}
+```{r}
+knitr::include_graphics(normalizePath("outputs/figures/04_residuals.png", winslash="/"))
+```
+:::
+::: {.column width="30%"}
+У M2 слабший вигин залишків.
+
+Зберігаються неоднаковий розкид, важкі хвости та впливові записи.
+
+Cook 4/n — привід перевірити, не автоматично видаляти.
+:::
+:::
+
+## Що показали гіпотези у M1?
+
+```{r}
+h <- ci[term %in% c("weight1000","year"),.(term,estimate,lower,upper)]
+knitr::kable(h,digits=2,col.names=c("Показник","Оцінка","Нижня 95%","Верхня 95%"))
+```
+
+**Маса:** близько −5,62 mpg на +1000 фунтів за однакових решти предикторів.
+
+**Рік:** близько +0,73 mpg на один модельний рік.
+
+Напрями підтримуються; інтервали враховують кластеризацію за назвами. Це асоціації в розвідувальному аналізі, не причинні ефекти.
+
+## Test: RMSE `r round(r$RMSE,2)` mpg
+
+::: {.columns}
+::: {.column width="65%"}
+```{r}
+knitr::include_graphics(normalizePath("outputs/figures/07_test_predictions.png", winslash="/"))
+```
+:::
+::: {.column width="35%"}
+::: {.metric}
+`r round(r$MAE,2)`
+:::
+MAE, mpg
+
+Константа: RMSE **`r round(r$baseline_RMSE,2)`**.
+
+Зниження RMSE: **`r round(r$improvement_percent,1)`%**.
+
+Test не використовувався для вибору специфікації.
+:::
+:::
+
+## Найекономніші авто — складніші для прогнозу
+
+```{r}
+knitr::kable(errs,digits=2,col.names=c("Фактичний mpg","n","MAE","RMSE","Зміщення"))
+```
+
+Для mpg >30 прогноз у середньому занижений приблизно на **2,45 mpg**.
+
+Лише 16 записів у цій групі. Після аналізу помилок модель не змінювалась.
+
+## Висновок і наступний крок
+
+**M2 точніша за константу на відкладених назвах**, але помилки й неоднаковий розкид залишаються.
+
+Маса та рік мають очікувані умовні асоціації в M1. Причинність не встановлено.
+
+Межі: історична вибірка, попередній EDA всього набору, неповні характеристики й недосконале групування споріднених авто.
+
+**Наступна перевірка:** зафіксована модель на справді нових моделях за тим самим протоколом вимірювання.
+
+::: {.sources}
+[DOE FOTW №1289](https://www.energy.gov/cmei/vehicles/articles/fotw-1289-may-8-2023-new-vehicle-fuel-economy-improved-33-1980-2022-while) · [EPA Trends 2025](https://www.epa.gov/system/files/documents/2026-02/420r26001.pdf) · [UCI Auto MPG](https://doi.org/10.24432/C5859H). Повна бібліографія — у звіті.
+:::

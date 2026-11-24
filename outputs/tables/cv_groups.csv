@@ -1,0 +1,733 @@
+group,repeat_id,fold
+chevy c20,1,1
+datsun 510,1,2
+buick century limited,1,3
+mazda glc custom l,1,4
+amc concord d/l,1,5
+ford torino,1,1
+chevrolet monza 2+2,1,2
+oldsmobile cutlass ls,1,3
+volkswagen rabbit,1,4
+amc gremlin,1,5
+datsun 610,1,1
+volvo 244dl,1,2
+pontiac phoenix,1,3
+fiat x1.9,1,4
+chrysler lebaron medallion,1,5
+mazda rx-4,1,1
+plymouth reliant,1,2
+mercedes-benz 240d,1,3
+chevrolet cavalier 2-door,1,4
+buick century,1,5
+mercury cougar brougham,1,1
+volkswagen rabbit custom,1,2
+datsun b210,1,3
+dodge d200,1,4
+honda accord lx,1,5
+chevrolet citation,1,1
+ford mustang ii 2+2,1,2
+volkswagen 411 (sw),1,3
+honda civic 1300,1,4
+fiat 131,1,5
+mazda glc,1,1
+datsun 810 maxima,1,2
+fiat 124 tc,1,3
+plymouth sapporo,1,4
+fiat strada custom,1,5
+dodge dart custom,1,1
+mazda glc 4,1,2
+amc concord dl,1,3
+ford pinto,1,4
+datsun 510 (sw),1,5
+vokswagen rabbit,1,1
+datsun 510 hatchback,1,2
+ford galaxie 500,1,3
+ford fairmont (auto),1,4
+dodge aspen,1,5
+chrysler cordoba,1,1
+amc hornet sportabout (sw),1,2
+chrysler newport royal,1,3
+plymouth arrow gs,1,4
+cadillac eldorado,1,5
+plymouth satellite,1,1
+pontiac firebird,1,2
+oldsmobile cutlass salon brougham,1,3
+plymouth fury,1,4
+toyota cressida,1,5
+amc rebel sst,1,1
+renault 12tl,1,2
+plymouth cricket,1,3
+pontiac astro,1,4
+peugeot 604sl,1,5
+plymouth 'cuda 340,1,1
+toyota corona mark ii,1,2
+oldsmobile starfire sx,1,3
+volkswagen type 3,1,4
+ford granada ghia,1,5
+saab 99gle,1,1
+renault lecar deluxe,1,2
+datsun 1200,1,3
+honda civic,1,4
+chevrolet cavalier wagon,1,5
+bmw 2002,1,1
+fiat 128,1,2
+dodge colt hardtop,1,3
+ford futura,1,4
+dodge charger 2.2,1,5
+volkswagen jetta,1,1
+ford granada l,1,2
+volvo diesel,1,3
+amc hornet,1,4
+oldsmobile vista cruiser,1,5
+toyota corona liftback,1,1
+dodge coronet custom (sw),1,2
+peugeot 304,1,3
+oldsmobile omega,1,4
+plymouth champ,1,5
+subaru,1,1
+peugeot 504 (sw),1,2
+mercedes-benz 280s,1,3
+cadillac seville,1,4
+renault 5 gtl,1,5
+peugeot 505s turbo diesel,1,1
+ford country squire (sw),1,2
+oldsmobile cutlass supreme,1,3
+fiat 124 sport coupe,1,4
+pontiac phoenix lj,1,5
+dodge aspen se,1,1
+volkswagen rabbit l,1,2
+ford thunderbird,1,3
+dodge aries se,1,4
+volvo 145e (sw),1,5
+chevrolet chevelle malibu,1,1
+ford f250,1,2
+amc concord dl 6,1,3
+toyota corona hardtop,1,4
+ford granada gl,1,5
+pontiac j2000 se hatchback,1,1
+buick skylark limited,1,2
+dodge colt m/m,1,3
+amc ambassador dpl,1,4
+toyota corolla liftback,1,5
+chevrolet chevette,1,1
+chevy c10,1,2
+volkswagen dasher,1,3
+ford granada,1,4
+datsun 210,1,5
+buick lesabre custom,1,1
+chevrolet vega,1,2
+dodge colt,1,3
+honda civic 1500 gl,1,4
+toyota corolla tercel,1,5
+toyouta corona mark ii (sw),1,1
+chevrolet impala,1,2
+mercury zephyr 6,1,3
+datsun pl510,1,4
+maxda glc deluxe,1,5
+plymouth grand fury,1,1
+ford fairmont,1,2
+mercury grand marquis,1,3
+datsun b-210,1,4
+plymouth satellite custom (sw),1,5
+ford ranger,1,1
+toyota corolla 1200,1,2
+honda accord cvcc,1,3
+datsun b210 gx,1,4
+dodge colt (sw),1,5
+buick skyhawk,1,1
+buick regal sport coupe (turbo),1,2
+chevrolet malibu,1,3
+plymouth satellite custom,1,4
+volvo 245,1,5
+plymouth horizon 4,1,1
+mazda rx2 coupe,1,2
+datsun 210 mpg,1,3
+chevy s-10,1,4
+mazda rx-7 gs,1,5
+pontiac sunbird coupe,1,1
+mercury capri v6,1,2
+audi fox,1,3
+chevrolet concours,1,4
+mercedes benz 300d,1,5
+chrysler lebaron salon,1,1
+saab 99le,1,2
+chevrolet monte carlo landau,1,3
+pontiac lemans v6,1,4
+toyota corolla,1,5
+plymouth duster,1,1
+ford country,1,2
+datsun 200sx,1,3
+capri ii,1,4
+chevrolet woody,1,5
+renault 18i,1,1
+datsun 280-zx,1,2
+dodge coronet brougham,1,3
+ford gran torino (sw),1,4
+toyota corona,1,5
+audi 5000s (diesel),1,1
+audi 5000,1,2
+ford fairmont (man),1,3
+datsun f-10 hatchback,1,4
+buick electra 225 custom,1,5
+chevrolet nova custom,1,1
+dodge diplomat,1,2
+chevrolet malibu classic (sw),1,3
+dodge colt hatchback custom,1,4
+toyota corolla 1600 (sw),1,5
+mazda glc deluxe,1,1
+chevrolet vega (sw),1,2
+toyota celica gt liftback,1,3
+datsun 710,1,4
+opel 1900,1,5
+ford pinto runabout,1,1
+chevrolet chevelle malibu classic,1,2
+ford mustang gl,1,3
+volkswagen scirocco,1,4
+amc pacer,1,5
+maxda rx3,1,1
+fiat 124b,1,2
+triumph tr7 coupe,1,3
+vw rabbit c (diesel),1,4
+chevrolet chevelle concours (sw),1,5
+dodge d100,1,1
+chevrolet cavalier,1,2
+plymouth horizon tc3,1,3
+volkswagen 1131 deluxe sedan,1,4
+ford gran torino,1,5
+ford fairmont futura,1,1
+plymouth fury iii,1,2
+ford torino 500,1,3
+dodge magnum xe,1,4
+honda prelude,1,5
+volvo 264gl,1,1
+hi 1200d,1,2
+mercury monarch ghia,1,3
+mazda glc custom,1,4
+vw dasher (diesel),1,5
+toyota carina,1,1
+ford fairmont 4,1,2
+audi 100 ls,1,3
+dodge challenger se,1,4
+amc matador (sw),1,5
+pontiac grand prix,1,1
+volkswagen super beetle,1,2
+mercury lynx l,1,3
+honda civic (auto),1,4
+audi 100ls,1,5
+mazda 626,1,1
+toyota starlet,1,2
+audi 4000,1,3
+ford maverick,1,4
+plymouth custom suburb,1,5
+buick century luxus (sw),1,1
+pontiac ventura sj,1,2
+chevrolet monte carlo s,1,3
+toyota celica gt,1,4
+mercury marquis,1,5
+chevrolet camaro,1,1
+mercury zephyr,1,2
+plymouth volare,1,3
+dodge aspen 6,1,4
+dodge monaco (sw),1,5
+amc pacer d/l,1,1
+pontiac catalina brougham,1,2
+nissan stanza xe,1,3
+plymouth horizon miser,1,4
+ford f108,1,5
+chevrolet bel air,1,1
+datsun 200-sx,1,2
+amc ambassador sst,1,3
+amc spirit dl,1,4
+chevrolet caprice classic,1,5
+plymouth horizon,1,1
+buick skylark,1,2
+volkswagen rabbit custom diesel,1,3
+dodge coronet custom,1,4
+plymouth cricket,2,1
+chevrolet monte carlo landau,2,2
+fiat 131,2,3
+plymouth duster,2,4
+amc ambassador sst,2,5
+honda accord lx,2,1
+volkswagen rabbit custom,2,2
+datsun 280-zx,2,3
+chrysler newport royal,2,4
+oldsmobile starfire sx,2,5
+datsun pl510,2,1
+triumph tr7 coupe,2,2
+chevrolet chevelle malibu classic,2,3
+ford pinto,2,4
+ford fairmont futura,2,5
+mercury lynx l,2,1
+pontiac phoenix lj,2,2
+plymouth arrow gs,2,3
+volvo 145e (sw),2,4
+mercedes-benz 240d,2,5
+amc hornet,2,1
+vw dasher (diesel),2,2
+dodge monaco (sw),2,3
+saab 99le,2,4
+fiat 128,2,5
+toyota starlet,2,1
+mercury monarch ghia,2,2
+buick skylark limited,2,3
+mazda rx-4,2,4
+audi 5000,2,5
+chevrolet chevelle malibu,2,1
+volkswagen rabbit,2,2
+amc ambassador dpl,2,3
+buick skyhawk,2,4
+dodge colt hardtop,2,5
+mazda glc custom l,2,1
+toyota celica gt liftback,2,2
+chevrolet cavalier wagon,2,3
+ford pinto runabout,2,4
+oldsmobile cutlass ls,2,5
+toyota cressida,2,1
+dodge aspen 6,2,2
+audi 4000,2,3
+honda civic (auto),2,4
+hi 1200d,2,5
+ford torino,2,1
+honda civic 1500 gl,2,2
+plymouth sapporo,2,3
+fiat 124b,2,4
+plymouth horizon tc3,2,5
+vokswagen rabbit,2,1
+vw rabbit c (diesel),2,2
+datsun 610,2,3
+chevrolet chevette,2,4
+datsun 1200,2,5
+datsun b-210,2,1
+pontiac catalina brougham,2,2
+chevrolet nova custom,2,3
+honda accord cvcc,2,4
+ford fairmont 4,2,5
+audi 100 ls,2,1
+fiat x1.9,2,2
+mercury capri v6,2,3
+chevy c20,2,4
+oldsmobile omega,2,5
+dodge aspen,2,1
+datsun 510,2,2
+plymouth fury,2,3
+buick century limited,2,4
+peugeot 505s turbo diesel,2,5
+volkswagen scirocco,2,1
+maxda glc deluxe,2,2
+dodge coronet custom (sw),2,3
+chevrolet citation,2,4
+renault 18i,2,5
+buick regal sport coupe (turbo),2,1
+toyouta corona mark ii (sw),2,2
+mazda glc custom,2,3
+volvo 245,2,4
+amc concord dl 6,2,5
+honda prelude,2,1
+chevrolet caprice classic,2,2
+datsun b210 gx,2,3
+chrysler lebaron medallion,2,4
+toyota corolla tercel,2,5
+plymouth volare,2,1
+toyota corona liftback,2,2
+amc concord d/l,2,3
+ford torino 500,2,4
+cadillac seville,2,5
+buick lesabre custom,2,1
+chevrolet bel air,2,2
+volkswagen 1131 deluxe sedan,2,3
+chevy c10,2,4
+volkswagen jetta,2,5
+maxda rx3,2,1
+buick electra 225 custom,2,2
+capri ii,2,3
+dodge colt,2,4
+toyota corona,2,5
+dodge d200,2,1
+buick century luxus (sw),2,2
+volvo 264gl,2,3
+dodge colt m/m,2,4
+pontiac grand prix,2,5
+chevrolet monte carlo s,2,1
+datsun f-10 hatchback,2,2
+plymouth horizon 4,2,3
+toyota carina,2,4
+mazda rx-7 gs,2,5
+plymouth 'cuda 340,2,1
+mercury zephyr 6,2,2
+mercedes-benz 280s,2,3
+chrysler cordoba,2,4
+fiat 124 tc,2,5
+mazda glc 4,2,1
+ford maverick,2,2
+dodge aspen se,2,3
+datsun 200-sx,2,4
+datsun 710,2,5
+plymouth satellite,2,1
+mazda glc deluxe,2,2
+audi 5000s (diesel),2,3
+volkswagen type 3,2,4
+dodge aries se,2,5
+renault 5 gtl,2,1
+datsun 510 (sw),2,2
+datsun 210,2,3
+chevrolet cavalier,2,4
+datsun 200sx,2,5
+chevy s-10,2,1
+renault lecar deluxe,2,2
+toyota celica gt,2,3
+pontiac sunbird coupe,2,4
+ford granada ghia,2,5
+plymouth reliant,2,1
+subaru,2,2
+dodge coronet custom,2,3
+oldsmobile cutlass supreme,2,4
+pontiac phoenix,2,5
+amc hornet sportabout (sw),2,1
+datsun 510 hatchback,2,2
+toyota corona hardtop,2,3
+oldsmobile cutlass salon brougham,2,4
+amc rebel sst,2,5
+dodge d100,2,1
+datsun 210 mpg,2,2
+plymouth horizon,2,3
+dodge magnum xe,2,4
+amc pacer,2,5
+cadillac eldorado,2,1
+plymouth custom suburb,2,2
+chrysler lebaron salon,2,3
+pontiac j2000 se hatchback,2,4
+buick skylark,2,5
+amc matador (sw),2,1
+ford mustang ii 2+2,2,2
+ford galaxie 500,2,3
+volkswagen rabbit l,2,4
+datsun 810 maxima,2,5
+plymouth grand fury,2,1
+mercury grand marquis,2,2
+volkswagen 411 (sw),2,3
+mercury zephyr,2,4
+fiat 124 sport coupe,2,5
+mazda rx2 coupe,2,1
+chevrolet malibu classic (sw),2,2
+pontiac ventura sj,2,3
+chevrolet vega (sw),2,4
+toyota corona mark ii,2,5
+ford fairmont (auto),2,1
+saab 99gle,2,2
+volvo 244dl,2,3
+mazda glc,2,4
+mercury cougar brougham,2,5
+ford f250,2,1
+ford ranger,2,2
+ford country,2,3
+toyota corolla liftback,2,4
+chevrolet vega,2,5
+chevrolet malibu,2,1
+amc spirit dl,2,2
+amc gremlin,2,3
+dodge dart custom,2,4
+chevrolet impala,2,5
+chevrolet camaro,2,1
+ford gran torino,2,2
+opel 1900,2,3
+pontiac firebird,2,4
+ford fairmont,2,5
+pontiac lemans v6,2,1
+renault 12tl,2,2
+plymouth fury iii,2,3
+ford f108,2,4
+plymouth satellite custom,2,5
+audi fox,2,1
+peugeot 504 (sw),2,2
+dodge coronet brougham,2,3
+chevrolet concours,2,4
+oldsmobile vista cruiser,2,5
+honda civic,2,1
+plymouth satellite custom (sw),2,2
+peugeot 604sl,2,3
+amc pacer d/l,2,4
+ford granada gl,2,5
+bmw 2002,2,1
+peugeot 304,2,2
+mercedes benz 300d,2,3
+volkswagen dasher,2,4
+volkswagen super beetle,2,5
+toyota corolla,2,1
+plymouth champ,2,2
+mazda 626,2,3
+ford granada l,2,4
+amc concord dl,2,5
+volkswagen rabbit custom diesel,2,1
+chevrolet chevelle concours (sw),2,2
+mercury marquis,2,3
+chevrolet monza 2+2,2,4
+chevrolet woody,2,5
+dodge colt hatchback custom,2,1
+ford country squire (sw),2,2
+ford mustang gl,2,3
+dodge charger 2.2,2,4
+chevrolet cavalier 2-door,2,5
+pontiac astro,2,1
+ford granada,2,2
+toyota corolla 1600 (sw),2,3
+buick century,2,4
+nissan stanza xe,2,5
+volvo diesel,2,1
+dodge colt (sw),2,2
+datsun b210,2,3
+fiat strada custom,2,4
+ford futura,2,5
+toyota corolla 1200,2,1
+ford thunderbird,2,2
+dodge diplomat,2,3
+dodge challenger se,2,4
+plymouth horizon miser,2,5
+honda civic 1300,2,1
+ford fairmont (man),2,2
+ford gran torino (sw),2,3
+audi 100ls,2,4
+oldsmobile cutlass ls,3,1
+ford pinto,3,2
+chevrolet caprice classic,3,3
+buick lesabre custom,3,4
+ford pinto runabout,3,5
+volvo 244dl,3,1
+datsun 280-zx,3,2
+audi 5000,3,3
+renault 12tl,3,4
+vw dasher (diesel),3,5
+chevrolet monza 2+2,3,1
+dodge dart custom,3,2
+buick regal sport coupe (turbo),3,3
+mazda glc custom l,3,4
+pontiac firebird,3,5
+volvo 264gl,3,1
+pontiac grand prix,3,2
+datsun 1200,3,3
+amc concord d/l,3,4
+plymouth volare,3,5
+chevrolet vega,3,1
+amc matador (sw),3,2
+renault 5 gtl,3,3
+plymouth grand fury,3,4
+dodge aspen se,3,5
+mazda 626,3,1
+dodge d100,3,2
+dodge diplomat,3,3
+audi 5000s (diesel),3,4
+honda civic (auto),3,5
+renault lecar deluxe,3,1
+datsun b210,3,2
+honda civic,3,3
+pontiac j2000 se hatchback,3,4
+audi 100ls,3,5
+volkswagen rabbit custom,3,1
+ford f250,3,2
+dodge d200,3,3
+volvo diesel,3,4
+amc ambassador dpl,3,5
+mercedes-benz 240d,3,1
+plymouth arrow gs,3,2
+cadillac eldorado,3,3
+plymouth satellite custom (sw),3,4
+dodge colt hatchback custom,3,5
+ford maverick,3,1
+bmw 2002,3,2
+toyota cressida,3,3
+chrysler lebaron salon,3,4
+plymouth cricket,3,5
+volkswagen rabbit custom diesel,3,1
+volkswagen type 3,3,2
+mercedes-benz 280s,3,3
+fiat 131,3,4
+ford fairmont (auto),3,5
+volkswagen super beetle,3,1
+subaru,3,2
+oldsmobile cutlass supreme,3,3
+honda civic 1500 gl,3,4
+dodge aspen,3,5
+volkswagen 411 (sw),3,1
+chevrolet concours,3,2
+mazda glc custom,3,3
+chevrolet cavalier 2-door,3,4
+plymouth satellite,3,5
+chevrolet monte carlo landau,3,1
+datsun 510 hatchback,3,2
+pontiac catalina brougham,3,3
+fiat 124 sport coupe,3,4
+datsun f-10 hatchback,3,5
+mercury zephyr 6,3,1
+mazda rx-7 gs,3,2
+plymouth duster,3,3
+toyota corolla liftback,3,4
+dodge magnum xe,3,5
+chevrolet cavalier wagon,3,1
+dodge coronet brougham,3,2
+datsun 200-sx,3,3
+amc gremlin,3,4
+chevy c20,3,5
+chevrolet camaro,3,1
+fiat 128,3,2
+ford granada ghia,3,3
+ford fairmont,3,4
+plymouth horizon,3,5
+peugeot 505s turbo diesel,3,1
+ford country squire (sw),3,2
+cadillac seville,3,3
+dodge monaco (sw),3,4
+toyota corolla 1600 (sw),3,5
+plymouth horizon tc3,3,1
+chevrolet malibu classic (sw),3,2
+dodge coronet custom,3,3
+fiat 124b,3,4
+honda accord lx,3,5
+buick skylark limited,3,1
+toyota corona liftback,3,2
+audi 4000,3,3
+volvo 145e (sw),3,4
+plymouth horizon miser,3,5
+toyouta corona mark ii (sw),3,1
+saab 99gle,3,2
+ford fairmont 4,3,3
+ford mustang ii 2+2,3,4
+hi 1200d,3,5
+saab 99le,3,1
+dodge aries se,3,2
+maxda glc deluxe,3,3
+chevrolet woody,3,4
+chevy c10,3,5
+chevrolet chevelle malibu,3,1
+fiat strada custom,3,2
+opel 1900,3,3
+buick century luxus (sw),3,4
+mercury marquis,3,5
+audi 100 ls,3,1
+pontiac lemans v6,3,2
+maxda rx3,3,3
+dodge colt m/m,3,4
+volvo 245,3,5
+datsun 710,3,1
+dodge colt hardtop,3,2
+chevrolet chevelle malibu classic,3,3
+buick skyhawk,3,4
+dodge colt,3,5
+datsun b-210,3,1
+plymouth sapporo,3,2
+pontiac astro,3,3
+ford galaxie 500,3,4
+amc pacer d/l,3,5
+plymouth custom suburb,3,1
+pontiac ventura sj,3,2
+peugeot 304,3,3
+mercedes benz 300d,3,4
+amc pacer,3,5
+amc concord dl,3,1
+volkswagen rabbit,3,2
+toyota corolla tercel,3,3
+fiat x1.9,3,4
+chevrolet vega (sw),3,5
+datsun 200sx,3,1
+ford fairmont futura,3,2
+dodge colt (sw),3,3
+ford gran torino,3,4
+peugeot 604sl,3,5
+buick electra 225 custom,3,1
+pontiac sunbird coupe,3,2
+pontiac phoenix lj,3,3
+chevrolet citation,3,4
+datsun 610,3,5
+fiat 124 tc,3,1
+ford ranger,3,2
+toyota corolla 1200,3,3
+ford fairmont (man),3,4
+ford gran torino (sw),3,5
+peugeot 504 (sw),3,1
+buick skylark,3,2
+chevy s-10,3,3
+volkswagen rabbit l,3,4
+plymouth reliant,3,5
+oldsmobile starfire sx,3,1
+datsun b210 gx,3,2
+datsun 510,3,3
+datsun 210 mpg,3,4
+mercury capri v6,3,5
+datsun 210,3,1
+chevrolet cavalier,3,2
+volkswagen 1131 deluxe sedan,3,3
+pontiac phoenix,3,4
+ford mustang gl,3,5
+mercury zephyr,3,1
+triumph tr7 coupe,3,2
+mazda glc,3,3
+toyota corona,3,4
+dodge challenger se,3,5
+ford granada gl,3,1
+mazda glc deluxe,3,2
+dodge charger 2.2,3,3
+datsun 810 maxima,3,4
+amc rebel sst,3,5
+toyota starlet,3,1
+mercury grand marquis,3,2
+plymouth fury,3,3
+ford thunderbird,3,4
+volkswagen dasher,3,5
+oldsmobile cutlass salon brougham,3,1
+nissan stanza xe,3,2
+ford country,3,3
+toyota celica gt,3,4
+mazda rx2 coupe,3,5
+chrysler cordoba,3,1
+buick century,3,2
+amc ambassador sst,3,3
+toyota corolla,3,4
+honda civic 1300,3,5
+honda accord cvcc,3,1
+dodge coronet custom (sw),3,2
+amc spirit dl,3,3
+chevrolet chevette,3,4
+ford granada l,3,5
+volkswagen jetta,3,1
+amc concord dl 6,3,2
+chevrolet malibu,3,3
+honda prelude,3,4
+plymouth horizon 4,3,5
+ford f108,3,1
+chevrolet chevelle concours (sw),3,2
+ford granada,3,3
+mercury cougar brougham,3,4
+amc hornet,3,5
+amc hornet sportabout (sw),3,1
+chevrolet impala,3,2
+dodge aspen 6,3,3
+toyota carina,3,4
+capri ii,3,5
+vw rabbit c (diesel),3,1
+mazda rx-4,3,2
+toyota corona mark ii,3,3
+mazda glc 4,3,4
+ford torino 500,3,5
+ford futura,3,1
+chrysler newport royal,3,2
+renault 18i,3,3
+chevrolet monte carlo s,3,4
+oldsmobile vista cruiser,3,5
+oldsmobile omega,3,1
+vokswagen rabbit,3,2
+chevrolet bel air,3,3
+toyota celica gt liftback,3,4
+plymouth champ,3,5
+plymouth satellite custom,3,1
+buick century limited,3,2
+mercury lynx l,3,3
+mercury monarch ghia,3,4
+ford torino,3,5
+audi fox,3,1
+volkswagen scirocco,3,2
+chrysler lebaron medallion,3,3
+datsun 510 (sw),3,4
+chevrolet nova custom,3,5
+plymouth 'cuda 340,3,1
+datsun pl510,3,2
+toyota corona hardtop,3,3
+plymouth fury iii,3,4
